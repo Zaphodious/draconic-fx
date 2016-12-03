@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ButtonBar?>
+
+<ButtonBar prefHeight="40.0" prefWidth="348.0" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1">
+   <buttons>
+      <Button fx:id="doesNothingButton" disable="true" mnemonicParsing="false" text="Does Nothing" />
+      <Button fx:id="doesSomethingButton" mnemonicParsing="false" text="Does Something" />
+   </buttons>
+</ButtonBar>
