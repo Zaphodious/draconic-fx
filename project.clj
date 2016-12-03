@@ -1,5 +1,5 @@
-(defproject draconic "0.1.0-SNAPSHOT"
-  :description "FIXME: write description"
+(defproject draconic-fx "0.1.0-SNAPSHOT"
+  :description "A library to help load and program JavaFX apps using FXML as the primary markup language."
   :url "http://example.com/FIXME"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
