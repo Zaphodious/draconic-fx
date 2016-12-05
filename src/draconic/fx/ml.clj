@@ -2,7 +2,8 @@
   (:require [draconic.fx :as fx :refer :all]
             [clojure.string :as str]
             [draconic.fx.assignment :as fxa]
-            [com.rpl.specter :as sp :refer :all])
+            [com.rpl.specter :as sp :refer :all]
+            [draconic.macros :as dramac])
   (:import (javafx.scene Scene)
            (javafx.stage Stage)
            (java.io ByteArrayInputStream)
@@ -66,7 +67,28 @@
   (run-now (do (.show the-stage)
                the-stage)))
 
+(defmacro defcontroller
+  "An optional convenience macro, used to declare a controller function. Because a map with string keys is passed in,
+   clojure destructuring works quite well to easily get names. This is awesome! But it's also a bit boilerplate-y after
+    a while. Also, for working at the REPL or chaining functions, it's helpful to return the str->node map. This
+     prevents that from being forgotten.
 
+  The first parameter will be used to name the map. Each subsiquent parameter will be bound using :strs
+
+  Returns the same thing as defn, which means that this form can be used as a parameter for launch-fxml-window.
+
+  If this doesn't meet the needs of the consuming project, a regular function of map->map that does whatever is
+   perfectly fine."
+  [varname docstring args & body]
+  (let [destructargs (into [] (rest args))
+        maparg (first args)
+        body-with-do (conj body 'do)]
+    (println "some args " destructargs)
+    (println "map arg" maparg)
+    (println body-with-do)
+    `(defn ~varname ~docstring [{:strs ~destructargs :as ~maparg}]
+       ~body-with-do
+       ~maparg)))
 
 (defn launch-fxml-window
   "Launches a window. First argument is a vector passed to make-composite-nodes. Second is a controller fn
@@ -74,7 +96,8 @@
    n->n. Third is a function that converts the a node into a stage (All post-composit loading and styling should be done here),
    defaults to draconic.fx.ml/make-stage, resulting in a functional if boring stage.
 
-   As this operation is stateful, please note that the operation order is 1) initialization/composition 2) passing the resulting node through the stage-making function and then showing it 3) passing the map through the controller-builder"
+   As this operation is stateful, please note that the operation order is 1) initialization/composition 2) passing
+    the resulting node through the stage-making function and then showing it 3) passing the map through the controller-builder"
   ([locstrings] (launch-fxml-window locstrings (fn [m] m) make-stage))
   ([locstrings controller-fn] (launch-fxml-window locstrings controller-fn make-stage))
   ([locstrings controller-fn node->stage]
@@ -92,8 +115,10 @@
   (launch-fxml-window ["resources/containerui.fxml"
                        ["midbox" "resources/simpleui.fxml"]
                        ["toppane" "resources/simplebuttonbar.fxml"]]
-                      (fn [{:strs [doesNothingButton doesSomethingButton aButton aLabel stage]
-                            :as   mappo-of-named-elements}]
+
+                      (defcontroller test-controller
+                        "Controller for the test thingy"
+                        [mappo-of-named-elements doesNothingButton doesSomethingButton aButton aLabel stage]
                         (println "The function has been called. " aButton)
                         (.setOnAction aButton (event-handler
                                                 [event]
@@ -102,8 +127,7 @@
                                                   (.setHeaderText the-alert "Button Pressing Message!")
                                                   (.setContentText the-alert "Horray! The Controller Fn Works!")
                                                   (.showAndWait the-alert)
-                                                  (println the-alert))))
-                        mappo-of-named-elements)))
+                                                  (println the-alert)))))))
 
 ;;;Alert alert = new Alert(AlertType.INFORMATION);
 ;;;alert.setTitle("Information Dialog");

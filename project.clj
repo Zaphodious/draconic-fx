@@ -3,7 +3,8 @@
   :url "http://example.com/FIXME"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
-  :plugins [[lein-kotlin "0.0.2"]]
+  :plugins [[lein-kotlin "0.0.2"]
+            [jonase/eastwood "0.2.3"]]
   :kotlin-source-path "src/draconic"
   :kotlin-compiler-version "1.0.4"
   :dependencies [[org.clojure/clojure "1.9.0-alpha14"]

@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file. This change
 ### Changed
 - Moved example to defn
 - Switched over to clojure 1.9.0-alpha14
+- Added a convenience macro to make creating controller functions easier.
 
 ## [0.2.0]
 ### Changed
