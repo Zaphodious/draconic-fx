@@ -1,4 +1,4 @@
-(defproject draconic-fx "0.2.0-SNAPSHOT"
+(defproject draconic-fx "0.3.0-SNAPSHOT"
   :description "A library to help load and program JavaFX apps using FXML as the primary markup language."
   :url "http://example.com/FIXME"
   :license {:name "Eclipse Public License"

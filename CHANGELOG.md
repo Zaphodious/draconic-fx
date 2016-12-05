@@ -3,6 +3,8 @@ All notable changes to this project will be documented in this file. This change
 
 ## [Unreleased]
 ### Changed
+
+## [0.3.0]
 - Moved example to defn
 - Switched over to clojure 1.9.0-alpha14
 - Added a convenience macro to make creating controller functions easier.
@@ -18,6 +20,7 @@ All notable changes to this project will be documented in this file. This change
 ### Changed
 - Initial project and API released
 
-[Unreleased]: https://github.com/Zaphodious/draconic/compare/0.2.0...HEAD
-[0.0.2]: https://github.com/Zaphodious/draconic/compare/0.1.0...0.2.0
-[0.0.1]: https://github.com/Zaphodious/draconic/compare/0.1.0...0.1.0
+[Unreleased]: https://github.com/Zaphodious/draconic/compare/0.3.0...HEAD
+[0.3.0]: https://github.com/Zaphodious/draconic/compare/0.2.0...0.3.0
+[0.2.0]: https://github.com/Zaphodious/draconic/compare/0.1.0...0.2.0
+[0.1.0]: https://github.com/Zaphodious/draconic/compare/0.1.0...0.1.0
