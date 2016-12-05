@@ -3,6 +3,7 @@ All notable changes to this project will be documented in this file. This change
 
 ## [Unreleased]
 ### Changed
+- Specced defcontroller, to try and help avoid errors.
 
 ## [0.3.0]
 - Moved example to defn
