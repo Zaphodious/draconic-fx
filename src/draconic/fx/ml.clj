@@ -85,22 +85,25 @@
 
      (run-now (controller-fn (into the-map {"stage" shown-stage}))))))
 
-(comment "The following is an example for how to launch a window using multiple FXML files, attaching a 'controller'-like function that sets the app's initial state.")
-(comment (launch-fxml-window ["resources/containerui.fxml"
-                              ["midbox" "resources/simpleui.fxml"]
-                              ["toppane" "resources/simplebuttonbar.fxml"]]
-                             (fn [{:strs [doesNothingButton doesSomethingButton aButton aLabel stage]
-                                   :as   mappo-of-named-elements}]
-                               (println "The function has been called. " aButton)
-                               (.setOnAction aButton (event-handler
-                                               [event]
-                                               (let [the-alert (new Alert (Alert$AlertType/INFORMATION))]
-                                                   (.setTitle the-alert "You pressed a button!")
-                                                   (.setHeaderText the-alert "Button Pressing Message!")
-                                                   (.setContentText the-alert "Horray! The Controller Fn Works!")
-                                                   (.showAndWait the-alert)
-                                                   (println the-alert))))
-                               mappo-of-named-elements)))
+
+(defn launch-test-window
+  "This is an example for how to launch a window using multiple FXML files, attaching a 'controller'-like function that sets the app's initial state."
+  []
+  (launch-fxml-window ["resources/containerui.fxml"
+                       ["midbox" "resources/simpleui.fxml"]
+                       ["toppane" "resources/simplebuttonbar.fxml"]]
+                      (fn [{:strs [doesNothingButton doesSomethingButton aButton aLabel stage]
+                            :as   mappo-of-named-elements}]
+                        (println "The function has been called. " aButton)
+                        (.setOnAction aButton (event-handler
+                                                [event]
+                                                (let [the-alert (new Alert (Alert$AlertType/INFORMATION))]
+                                                  (.setTitle the-alert "You pressed a button!")
+                                                  (.setHeaderText the-alert "Button Pressing Message!")
+                                                  (.setContentText the-alert "Horray! The Controller Fn Works!")
+                                                  (.showAndWait the-alert)
+                                                  (println the-alert))))
+                        mappo-of-named-elements)))
 
 ;;;Alert alert = new Alert(AlertType.INFORMATION);
 ;;;alert.setTitle("Information Dialog");

@@ -6,7 +6,7 @@
   :plugins [[lein-kotlin "0.0.2"]]
   :kotlin-source-path "src/draconic"
   :kotlin-compiler-version "1.0.4"
-  :dependencies [[org.clojure/clojure "1.8.0"]
+  :dependencies [[org.clojure/clojure "1.9.0-alpha14"]
                  [org.jetbrains.kotlin/kotlin-runtime "1.0.4"]
                  [org.controlsfx/controlsfx "8.40.10"]
                  [com.rpl/specter "0.13.1"]

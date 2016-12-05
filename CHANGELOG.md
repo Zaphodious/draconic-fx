@@ -3,6 +3,8 @@ All notable changes to this project will be documented in this file. This change
 
 ## [Unreleased]
 ### Changed
+- Moved example to defn
+- Switched over to clojure 1.9.0-alpha14
 
 ## [0.2.0]
 ### Changed
