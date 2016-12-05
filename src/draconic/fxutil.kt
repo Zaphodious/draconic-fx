@@ -7,6 +7,7 @@ import clojure.lang.IFn
 import javafx.event.Event
 import javafx.event.EventHandler
 import javafx.event.EventType
+import javafx.scene.Node
 import javafx.scene.control.Button
 import javafx.scene.control.TextArea
 import javafx.scene.layout.BorderPane
@@ -25,6 +26,7 @@ import java.util.*
  * an IDE is useful for working with JavaFX, as working with the library seems to be
  * primarily designed to be done from the auto-complete prompt.
  */
+
 @Deprecated("Strictly used for interop testing")
 fun foo(baz: String): String {
     return "baz is $baz"

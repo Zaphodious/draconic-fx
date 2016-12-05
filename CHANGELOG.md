@@ -3,22 +3,18 @@ All notable changes to this project will be documented in this file. This change
 
 ## [Unreleased]
 ### Changed
-- Add a new arity to `make-widget-async` to provide a different widget shape.
 
-## [0.1.1] - 2016-12-02
+## [0.2.0]
 ### Changed
-- Documentation on how to make the widgets.
+- Changed "draconic.fx.parent" namespace to "draconic.fx.assignment"
+- Added support for multiple set and get operations, instead of just for children.
+- To that end, changed names and signatures. Now you call draconic.fx.assignment/try-get and try-set!, passing in the target node and a keyword which lets the fn know which operation to perform.
+- Added multimethods get-typed, get-defaults, set-typed, and set-defaults. try-x call x-typed, which falls through to x-defaults if no type-specific information is found. x-defaults dispatches on :op-keyword, and x-typed on [:op-keyword, "type ***as a string***"]. Why as a string? Because JavaFX doesn't let me resolve classes sometimes.
 
-### Removed
-- `make-widget-sync` - we're all async, all the time.
+## [0.1.0] - 2016-12-04
+### Changed
+- Initial project and API released
 
-### Fixed
-- Fixed widget maker to keep working when daylight savings switches over.
-
-## 0.1.0 - 2016-12-02
-### Added
-- Files from the new template.
-- Widget maker public API - `make-widget-sync`.
-
-[Unreleased]: https://github.com/your-name/draconic/compare/0.1.1...HEAD
-[0.1.1]: https://github.com/your-name/draconic/compare/0.1.0...0.1.1
+[Unreleased]: https://github.com/Zaphodious/draconic/compare/0.2.0...HEAD
+[0.0.2]: https://github.com/Zaphodious/draconic/compare/0.1.0...0.2.0
+[0.0.1]: https://github.com/Zaphodious/draconic/compare/0.1.0...0.1.0

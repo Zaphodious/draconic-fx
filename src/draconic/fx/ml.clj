@@ -1,7 +1,7 @@
 (ns draconic.fx.ml
   (:require [draconic.fx :as fx :refer :all]
             [clojure.string :as str]
-            [draconic.fx.parent :as fxpar]
+            [draconic.fx.assignment :as fxa]
             [com.rpl.specter :as sp :refer :all])
   (:import (javafx.scene Scene)
            (javafx.stage Stage)
@@ -23,20 +23,24 @@
         map-of-IDs (into {} (.getNamespace loader))]
     [node map-of-IDs]))
 
-
+(defn make-node-from [string-or-fn]
+  (cond
+    (string? string-or-fn) (make-node-with-id-map string-or-fn)
+    (fn? string-or-fn) (string-or-fn)
+    :default (throw (new Exception (str string-or-fn " is neither a string or an IFn, and thus we can't make a node from it.")))))
 
 (defn make-composite-nodes
-  "Makes a composite node using multiple FXML files. Takes a vector containing the first FXML file to load, followed by repeating vectors of [string ID, FXML file location] where each FXML-generated node is added as a child to the node matching the ID."
+  "Makes a composite node using multiple FXML files. Takes a vector containing the first FXML file to load, followed by an arbitrary number of vectors. The first element of each vector is the ID where the resulting node will end up, and the second element is either a string representing an FXML file location or a zero-arg fn yielding a vector of [generated node, map of String->Node]"
   [[first-loc & pairs-of-id-to-loc]]
   (println pairs-of-id-to-loc)
   (if (empty? pairs-of-id-to-loc)
     (make-node-with-id-map first-loc)
     (let [[primary-node __first-map] (make-node-with-id-map first-loc)
-          finished-map (reduce (fn [o-mappo-grande [this-str-id isso-fxml-loc]]
-                                 (let [[o-nodio o-mappo-novo] (make-node-with-id-map isso-fxml-loc)
+          finished-map (reduce (fn [o-mappo-grande [this-str-id node-loc]]
+                                 (let [[o-nodio o-mappo-novo] (make-node-with-id-map node-loc)
                                        mappo-grande-novo (into o-mappo-grande o-mappo-novo)]
                                    (println "nodio " o-nodio "e o mappo grande novo" mappo-grande-novo)
-                                   (fxpar/add-children (get o-mappo-grande this-str-id) o-nodio)
+                                   (fxa/try-set! (get o-mappo-grande this-str-id) :children [o-nodio])
                                    (println "add-children isn't the issue?")
                                    mappo-grande-novo))
                                __first-map
@@ -65,10 +69,12 @@
 
 
 (defn launch-fxml-window
-  "Launches a window. First argument is a vector of locations used by make-composite-nodes. Second is a controller fn
+  "Launches a window. First argument is a vector passed to make-composite-nodes. Second is a controller fn
   used to setup the resulting window post-launch (this function returns whatever this one does), defaults to a function
    n->n. Third is a function that converts the a node into a stage (All post-composit loading and styling should be done here),
-   defaults to draconic.fx.ml/make-stage, resulting in a functional if boring stage."
+   defaults to draconic.fx.ml/make-stage, resulting in a functional if boring stage.
+
+   As this operation is stateful, please note that the operation order is 1) initialization/composition 2) passing the resulting node through the stage-making function and then showing it 3) passing the map through the controller-builder"
   ([locstrings] (launch-fxml-window locstrings (fn [m] m) make-stage))
   ([locstrings controller-fn] (launch-fxml-window locstrings controller-fn make-stage))
   ([locstrings controller-fn node->stage]
@@ -79,7 +85,7 @@
 
      (run-now (controller-fn (into the-map {"stage" shown-stage}))))))
 
-(comment "The following is an example for how to launch a window using multiple FXML files, attaching a 'controller'-like function that sets the app's state")
+(comment "The following is an example for how to launch a window using multiple FXML files, attaching a 'controller'-like function that sets the app's initial state.")
 (comment (launch-fxml-window ["resources/containerui.fxml"
                               ["midbox" "resources/simpleui.fxml"]
                               ["toppane" "resources/simplebuttonbar.fxml"]]
