@@ -3,7 +3,8 @@
             [clojure.string :as str]
             [draconic.fx.assignment :as fxa]
             [com.rpl.specter :as sp :refer :all]
-            [draconic.macros :as dramac])
+            [draconic.macros :as dramac]
+            [clojure.spec :as s])
   (:import (javafx.scene Scene)
            (javafx.stage Stage)
            (java.io ByteArrayInputStream)
@@ -83,12 +84,13 @@
   (let [destructargs (into [] (rest args))
         maparg (first args)
         body-with-do (conj body 'do)]
-    (println "some args " destructargs)
-    (println "map arg" maparg)
-    (println body-with-do)
     `(defn ~varname ~docstring [{:strs ~destructargs :as ~maparg}]
        ~body-with-do
        ~maparg)))
+
+(s/fdef defcontroller
+        :args (s/and (s/cat :varname symbol? :docstring string? :args vector? :body (s/* any?)))
+  )
 
 (defn launch-fxml-window
   "Launches a window. First argument is a vector passed to make-composite-nodes. Second is a controller fn
