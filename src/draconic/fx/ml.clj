@@ -9,7 +9,7 @@
            (javafx.stage Stage)
            (java.io ByteArrayInputStream)
            (javafx.fxml FXMLLoader)
-           (javafx.scene.control Alert Alert$AlertType)))
+           (javafx.scene.control Alert Alert$AlertType Label)))
 
 (defn make-loader
   "Makes and returns an FXML Loader"
@@ -36,10 +36,10 @@
   [[first-loc & pairs-of-id-to-loc]]
   (println pairs-of-id-to-loc)
   (if (empty? pairs-of-id-to-loc)
-    (make-node-with-id-map first-loc)
-    (let [[primary-node __first-map] (make-node-with-id-map first-loc)
+    (make-node-from first-loc)
+    (let [[primary-node __first-map] (make-node-from first-loc)
           finished-map (reduce (fn [o-mappo-grande [this-str-id node-loc]]
-                                 (let [[o-nodio o-mappo-novo] (make-node-with-id-map node-loc)
+                                 (let [[o-nodio o-mappo-novo] (make-node-from node-loc)
                                        mappo-grande-novo (into o-mappo-grande o-mappo-novo)]
                                    (println "nodio " o-nodio "e o mappo grande novo" mappo-grande-novo)
                                    (fxa/try-set! (get o-mappo-grande this-str-id) :children [o-nodio])
@@ -92,6 +92,10 @@
         :args (s/and (s/cat :varname symbol? :docstring string? :args vector? :body (s/* any?)))
   )
 
+(defn print-thing [thing]
+  (println "Printed-Thing: " thing)
+  thing)
+
 (defn launch-fxml-window
   "Launches a window. First argument is a vector passed to make-composite-nodes. Second is a controller fn
   used to setup the resulting window post-launch (this function returns whatever this one does), defaults to a function
@@ -106,17 +110,24 @@
    (let [[the-node the-map] (make-composite-nodes locstrings)
          shown-stage (-> the-node
                          (node->stage)
+                         (print-thing)
                          (show-stage))]
 
      (run-now (controller-fn (into the-map {"stage" shown-stage}))))))
 
+(defn makes-a-label
+  []
+  (let [the-label (new Label)]
+    (.setText the-label  "Hello There!")
+    [the-label {"anotherLabel" the-label}]))
 
 (defn launch-test-window
   "This is an example for how to launch a window using multiple FXML files, attaching a 'controller'-like function that sets the app's initial state."
   []
   (launch-fxml-window ["resources/containerui.fxml"
                        ["midbox" "resources/simpleui.fxml"]
-                       ["toppane" "resources/simplebuttonbar.fxml"]]
+                       ["toppane" "resources/simplebuttonbar.fxml"]
+                       ["bottomOne" makes-a-label]]
 
                       (defcontroller test-controller
                         "Controller for the test thingy"

@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file. This change
 ## [Unreleased]
 ### Changed
 - Specced defcontroller, to try and help avoid errors.
+- Added a few helper functions to fx.assignment. Something prevents set!-defaults from working properly, so some things like setting ID (which is identical across all nodes) now go into their own functions.
 
 ## [0.3.0]
 - Moved example to defn

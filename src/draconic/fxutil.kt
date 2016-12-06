@@ -10,10 +10,7 @@ import javafx.event.EventType
 import javafx.scene.Node
 import javafx.scene.control.Button
 import javafx.scene.control.TextArea
-import javafx.scene.layout.BorderPane
-import javafx.scene.layout.HBox
-import javafx.scene.layout.Pane
-import javafx.scene.layout.VBox
+import javafx.scene.layout.*
 import java.util.*
 
 
