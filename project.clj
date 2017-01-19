@@ -1,4 +1,4 @@
-(defproject draconic-fx "0.3.0-SNAPSHOT"
+(defproject draconic-fx "0.4.1-SNAPSHOT"
   :description "A library to help load and program JavaFX apps using FXML as the primary markup language."
   :url "http://example.com/FIXME"
   :license {:name "Eclipse Public License"
@@ -9,7 +9,7 @@
   :kotlin-compiler-version "1.0.4"
   :dependencies [[org.clojure/clojure "1.9.0-alpha14"]
                  [org.jetbrains.kotlin/kotlin-runtime "1.0.4"]
-                 [org.controlsfx/controlsfx "8.40.10"]
+                 [org.controlsfx/controlsfx "8.40.11"]
                  [com.rpl/specter "0.13.1"]
                  [org.clojure/core.async "0.2.395"]
                  [org.clojure/java.data "0.1.1"]
