@@ -3,10 +3,18 @@ All notable changes to this project will be documented in this file. This change
 
 ## [Unreleased]
 ### Changed
+- Fixed a bug where nested run-now calls would hang the JavaFX Application Thread. Turns out that promises don't really stack all that well!
+
+## [0.4.1]
+### Changed
+- Added draconic.fx.cells, which contains functions to help add custom cells to views that use them. Proxies FTW!
+- Added several new assignment functions
 - Specced defcontroller, to try and help avoid errors.
 - Added a few helper functions to fx.assignment. Something prevents set!-defaults from working properly, so some things like setting ID (which is identical across all nodes) now go into their own functions.
+- Added a resettable fn to fx.ml, so that getting a resource via string is a little less error-prone
 
 ## [0.3.0]
+### Changed
 - Moved example to defn
 - Switched over to clojure 1.9.0-alpha14
 - Added a convenience macro to make creating controller functions easier.

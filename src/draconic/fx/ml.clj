@@ -4,29 +4,46 @@
             [draconic.fx.assignment :as fxa]
             [com.rpl.specter :as sp :refer :all]
             [draconic.macros :as dramac]
-            [clojure.spec :as s])
-  (:import (javafx.scene Scene)
+            [clojure.spec :as s]
+            [clojure.java.io :as io]
+            [draconic.ui :as dui]
+            [draconic.fx.ui :as -dfxui])
+  (:import (com.blakwurm.draconic draconicKt)
+           (javafx.scene Scene)
            (javafx.stage Stage)
            (java.io ByteArrayInputStream)
            (javafx.fxml FXMLLoader)
-           (javafx.scene.control Alert Alert$AlertType Label)))
+           (javafx.scene.control Alert Alert$AlertType Label)
+           (javafx.scene.control Label)))
+
+(def io-get-fn-atom (atom (fn [locstring] (io/resource locstring))))
+(defn io-get [locstring]
+  (@io-get-fn-atom locstring))
+
 
 (defn make-loader
   "Makes and returns an FXML Loader"
   []
   (new FXMLLoader))
 
-(defn make-node-with-id-map
-  "Returns a vector of the parent FX node from FXML file at the location specified, and a map of String->Node for each item in the FXML file with an ID."
-  [locstring]
-  (let [fxml-string (slurp locstring)
+(defn make-node-with-id-map-from-url
+  [urlish]
+  (let [fxml-string (slurp urlish)
         loader (make-loader)
         node (run-now (.load loader (new ByteArrayInputStream (.getBytes fxml-string))))
         map-of-IDs (into {} (.getNamespace loader))]
     [node map-of-IDs]))
 
+(defn make-node-with-id-map
+  "Returns a vector of the parent FX node from FXML file at the location specified, and a map of String->Node for each item in the FXML file with an ID."
+  [locstring]
+  (make-node-with-id-map-from-url (io-get locstring)))
+
+;;awesome clojure debugging trick: (defonce debug (atom [])) (defn foo [& args] (let [.... result (...)] (swap! debug conj {:args args :result result}) result)
+
 (defn make-node-from [string-or-fn]
   (cond
+    (= (str (class string-or-fn)) "class java.net.URL") (make-node-with-id-map-from-url string-or-fn)
     (string? string-or-fn) (make-node-with-id-map string-or-fn)
     (fn? string-or-fn) (string-or-fn)
     :default (throw (new Exception (str string-or-fn " is neither a string or an IFn, and thus we can't make a node from it.")))))
@@ -47,8 +64,8 @@
                                    mappo-grande-novo))
                                __first-map
                                pairs-of-id-to-loc)]
-      [primary-node finished-map]
-      )))
+      [primary-node finished-map])))
+
 
 ;; 8776048833
 ;; 978.38, 6359825
@@ -60,10 +77,10 @@
     (let [stage (new Stage)
           scene (new Scene the-node)]
       (.setScene stage scene)
-      stage
-      )))
+      stage)))
 
-(defn show-stage
+
+(defn ^:dynamic *show-stage*
   [the-stage]
   (run-now (do (.show the-stage)
                the-stage)))
@@ -78,7 +95,7 @@
 
   Returns the same thing as defn, which means that this form can be used as a parameter for launch-fxml-window.
 
-  If this doesn't meet the needs of the consuming project, a regular function of map->map that does whatever is
+  If this doesn't meet the needs of the consuming project, a regular function of map->map (or, map->whatever else) that does whatever is
    perfectly fine."
   [varname docstring args & body]
   (let [destructargs (into [] (rest args))
@@ -88,9 +105,25 @@
        ~body-with-do
        ~maparg)))
 
+(defmacro defcontroller-selector
+  "Similar to defcontroller, but returns an atom rather then the node map. The atom's symbol is the *last* argument in the args vector, like how the map's symbol is the *first* If blocking is desired, a promise can be passed into the launch-fxml-window function, which will return this atom when the launched window closes.
+
+  *Not* an overload of defcontroller to avoid ambiguity."
+  [varname docstring args & body]
+  (let [destructargs (into [] (-> args (rest) (drop-last)))
+        maparg (first args)
+        atomarg (last args)
+        body-with-do (conj body 'do)]
+    `(defn ~varname ~docstring [{:strs ~destructargs :as ~maparg}]
+       (let [~atomarg (atom 42)]
+         ~body-with-do
+         ~atomarg))))
+
 (s/fdef defcontroller
-        :args (s/and (s/cat :varname symbol? :docstring string? :args vector? :body (s/* any?)))
-  )
+        :args (s/and (s/cat :varname symbol? :docstring string? :args vector? :body (s/* any?))))
+
+
+
 
 (defn print-thing [thing]
   (println "Printed-Thing: " thing)
@@ -106,41 +139,50 @@
     the resulting node through the stage-making function and then showing it 3) passing the map through the controller-builder"
   ([locstrings] (launch-fxml-window locstrings (fn [m] m) make-stage))
   ([locstrings controller-fn] (launch-fxml-window locstrings controller-fn make-stage))
-  ([locstrings controller-fn node->stage]
+  ([locstrings controller-fn node->stage] (launch-fxml-window locstrings controller-fn node->stage nil))
+  ([locstrings controller-fn node->stage the-promise]
    (let [[the-node the-map] (make-composite-nodes locstrings)
-         shown-stage (-> the-node
-                         (node->stage)
-                         (print-thing)
-                         (show-stage))]
+         the-main-stage (-> the-node
+                            (node->stage)
+                            (print-thing)
+                            (*show-stage*))
+         controller-return (controller-fn (into the-map {"stage" the-main-stage}))]
 
-     (run-now (controller-fn (into the-map {"stage" shown-stage}))))))
+
+     (if the-promise
+       (do
+         (fx/run-later (.setOnHiding the-main-stage (fx/event-handler [the-event] (deliver the-promise controller-return))))
+         (deref the-promise))
+       controller-return))))
 
 (defn makes-a-label
   []
   (let [the-label (new Label)]
-    (.setText the-label  "Hello There!")
+    (dui/set-state! the-label "Hello There!")
     [the-label {"anotherLabel" the-label}]))
 
 (defn launch-test-window
   "This is an example for how to launch a window using multiple FXML files, attaching a 'controller'-like function that sets the app's initial state."
   []
-  (launch-fxml-window ["resources/containerui.fxml"
-                       ["midbox" "resources/simpleui.fxml"]
-                       ["toppane" "resources/simplebuttonbar.fxml"]
+  (launch-fxml-window ["containerui.fxml"
+                       ["midbox" "simpleui.fxml"]
+                       ["toppane" "simplebuttonbar.fxml"]
                        ["bottomOne" makes-a-label]]
 
-                      (defcontroller test-controller
-                        "Controller for the test thingy"
-                        [mappo-of-named-elements doesNothingButton doesSomethingButton aButton aLabel stage]
-                        (println "The function has been called. " aButton)
-                        (.setOnAction aButton (event-handler
-                                                [event]
-                                                (let [the-alert (new Alert (Alert$AlertType/INFORMATION))]
-                                                  (.setTitle the-alert "You pressed a button!")
-                                                  (.setHeaderText the-alert "Button Pressing Message!")
-                                                  (.setContentText the-alert "Horray! The Controller Fn Works!")
-                                                  (.showAndWait the-alert)
-                                                  (println the-alert)))))))
+                      (defcontroller-selector test-controller
+                                              "Controller for the test thingy"
+                                              [mappo-of-named-elements doesNothingButton doesSomethingButton aButton aLabel stage atomo]
+                                              (println "The function has been called. " aButton)
+                                              (swap! atomo (fn [e] "alert worked!"))
+                                              (.setOnAction aButton (event-handler
+                                                                      [event]
+                                                                      (let [the-alert (new Alert (Alert$AlertType/INFORMATION))]
+                                                                        (.setTitle the-alert "You pressed a button!")
+                                                                        (.setHeaderText the-alert "Button Pressing Message!")
+                                                                        (.setContentText the-alert "Horray! The Controller Fn Works!")
+                                                                        (.showAndWait the-alert)
+
+                                                                        (println the-alert)))))))
 
 ;;;Alert alert = new Alert(AlertType.INFORMATION);
 ;;;alert.setTitle("Information Dialog");
