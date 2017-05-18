@@ -15,6 +15,6 @@
                  [org.clojure/core.async "0.2.395"]
                  [org.clojure/java.data "0.1.1"]
                  [camel-snake-kebab "0.4.0"]
-                 [draconic.ui "0.2.2-SNAPSHOT"]]
+                 [draconic.ui "0.3.2-SNAPSHOT"]]
   :profiles {:repl {:dependencies [[org.jetbrains.kotlin/kotlin-compiler "1.0.4"]]}}
   :prep-tasks ["kotlin"])
